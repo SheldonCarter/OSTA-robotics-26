@@ -10,13 +10,15 @@ from vex import *
 brain = Brain()
 
 # Robot configuration code
-claw_motor = Motor(Ports.PORT3, GearSetting.RATIO_18_1, False)
+claw_motor = Motor(Ports.PORT7, GearSetting.RATIO_18_1, False)
 
 #8L, 3R
 left_elevator = Motor(Ports.PORT8, GearSetting.RATIO_18_1, False)
-right_elevator = Motor(Ports.PORT3, GearSetting.RATIO_18_1, True)
+right_elevator = Motor(Ports.PORT3, GearSetting.RATIO_18_1, False)
 
 controller_1 = Controller(PRIMARY)
+
+spinner = Motor(Ports.PORT4, GearSetting.RATIO_18_1, True)
 
 front_left = Motor(Ports.PORT1, GearSetting.RATIO_18_1, True)
 front_right = Motor(Ports.PORT10, GearSetting.RATIO_18_1, False)
@@ -68,16 +70,20 @@ left_elevator.set_stopping(HOLD)
 right_elevator.set_stopping(HOLD)
 
 claw_motor.set_stopping(HOLD)
+spinner.set_stopping(HOLD)
 
-left_elevator.set_velocity(60, PERCENT)
-right_elevator.set_velocity(60, PERCENT)
+left_elevator.set_velocity(30, PERCENT)
+right_elevator.set_velocity(30, PERCENT)
 
 claw_motor.set_velocity(30, PERCENT)
+spinner.set_velocity(30, PERCENT)
+
 
 while True:
-    forward = controller_1.axis3.position()  # left stick up/down
-    strafe = controller_1.axis4.position()   # left stick left/right
-    turn = controller_1.axis1.position()     # right stick left/right
+    forward = controller_1.axis3.position()  
+    strafe = controller_1.axis4.position()   
+    turn = controller_1.axis1.position()     
+    spin = controller_1.axis2.position()
 
     # Deadband to stop drift
     if abs(forward) < 5:
@@ -86,9 +92,11 @@ while True:
         strafe = 0
     if abs(turn) < 5:
         turn = 0
+    
+    spinner.spin(FORWARD, clamp(spin), PERCENT)
 
     front_left.spin(FORWARD,  clamp(forward + strafe + turn), PERCENT)
     front_right.spin(FORWARD, clamp(forward - strafe - turn), PERCENT)
-    back_left.spin(FORWARD,   clamp(forward - strafe + turn), PERCENT)
+    back_left.spin(FORWARD, clamp(forward - strafe + turn), PERCENT)
     back_right.spin(FORWARD,  clamp(forward + strafe - turn), PERCENT)
     wait(5, MSEC)
