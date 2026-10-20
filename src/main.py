@@ -1,11 +1,21 @@
 from vex import *
 
+# GEAR RATIOS
+# BLUE 6_1 max rpm 600
+# GREEN 18_1 max rpm 200
+# RED 36_1 max rpm 100
+
+
 # Brain should be defined by default
 brain = Brain()
 
 # Robot configuration code
 claw_motor = Motor(Ports.PORT3, GearSetting.RATIO_18_1, False)
-elevator_motor = Motor(Ports.PORT8, GearSetting.RATIO_18_1, False)
+
+#8L, 3R
+left_elevator = Motor(Ports.PORT8, GearSetting.RATIO_18_1, False)
+right_elevator = Motor(Ports.PORT3, GearSetting.RATIO_18_1, True)
+
 controller_1 = Controller(PRIMARY)
 
 front_left = Motor(Ports.PORT1, GearSetting.RATIO_18_1, True)
@@ -15,16 +25,21 @@ back_right = Motor(Ports.PORT2, GearSetting.RATIO_18_1, False)
 
 
 def controller_L1_Pressed():
-    elevator_motor.spin(FORWARD)
+    left_elevator.spin(FORWARD)
+    right_elevator.spin(FORWARD)
+    # elevator_motor.spin(FORWARD)
     while controller_1.buttonL1.pressing():
         wait(5, MSEC)
-    elevator_motor.stop()
+    left_elevator.stop()
+    right_elevator.stop()
 
 def controller_L2_Pressed():
-    elevator_motor.spin(REVERSE)
+    left_elevator.spin(REVERSE)
+    right_elevator.spin(REVERSE)
     while controller_1.buttonL2.pressing():
         wait(5, MSEC)
-    elevator_motor.stop()
+    left_elevator.stop()
+    right_elevator.stop()
 
 def controller_R1_Pressed():
     claw_motor.spin(REVERSE)
@@ -49,9 +64,14 @@ controller_1.buttonR1.pressed(controller_R1_Pressed)
 controller_1.buttonR2.pressed(controller_R2_Pressed)
 wait(15, MSEC)
 
-elevator_motor.set_stopping(HOLD)
+left_elevator.set_stopping(HOLD)
+right_elevator.set_stopping(HOLD)
+
 claw_motor.set_stopping(HOLD)
-elevator_motor.set_velocity(60, PERCENT)
+
+left_elevator.set_velocity(60, PERCENT)
+right_elevator.set_velocity(60, PERCENT)
+
 claw_motor.set_velocity(30, PERCENT)
 
 while True:
